@@ -1,10 +1,18 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"log"
+)
 
 func main() {
 	initDbController()
-	fmt.Println("Hellow")
-	//fmt.Println(createUser("axolotl", "Im him", "snaveenbharath2007@gmail.com", "Py2nb-0513"))
-	fmt.Println(validateUser("snaveenbharath2007@gmail.com", "Py2nb-05131"))
+	log.Println(createUser("him", "im him again", "againimhim@gmail.com", "GoB!g123"))
+	app := &app{
+		server_config: config{
+			Addr: ":8080",
+		},
+	}
+	router_mux := app.mount()
+	fmt.Println(app.initialiseServer(router_mux))
 }

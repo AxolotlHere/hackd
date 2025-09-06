@@ -80,12 +80,13 @@
 		&gt; Crack the code_ <span class="animate-pulse">█</span>
 	</p>
 
-	<button
-		on:click={goToAuth}
-		class="px-8 py-3 rounded-xl border border-cyan-400 text-cyan-400 hover:bg-cyan-400/20 hover:shadow-[0_0_25px_#00ffff] transition-all font-mono tracking-widest"
-	>
-		Enter the System
-	</button>
+	<div class="text-grey-500 text-lg text-green-400 flex flex-col text-center">
+		<button
+			onclick={goToAuth}
+			class="p-2 text-white m-3 border-2 border-green-400 shadow-sm shadow-green-400 rounded-lg text-sm hover:bg-green-400 hover:shadow-none hover:text-black transition-colors duration-700"
+			>LOGIN/SIGN-UP</button
+		>
+	</div>
 
 	<footer class="absolute bottom-6 text-green-500 font-mono text-sm">
 		&gt;_ May the force be with you

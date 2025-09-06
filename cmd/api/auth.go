@@ -31,17 +31,16 @@ func validatePassword(password string) error {
 	return nil
 }
 
-func createUser(username, description, email, password string) error {
+func createUser(Username, Description, Email, password string) error {
 	sql := `
-	SELECT MAX(uid) FROM userdata
+	SELECT MAX(UID) FROM userdata
 	`
 	var uid_nxt int
 	err := pool.QueryRow(ctx, sql).Scan(&uid_nxt)
 	if err != nil {
-		fmt.Println(err)
 		return fmt.Errorf("Returned an error while querying : %s", err.Error())
 	}
-	_, err = mail.ParseAddress(email)
+	_, err = mail.ParseAddress(Email)
 	if err != nil {
 		return fmt.Errorf("Returned error : %s", err.Error())
 	}
@@ -56,28 +55,45 @@ func createUser(username, description, email, password string) error {
 	INSERT INTO userdata VALUES ($1,$2,$3,0,0,$4,$5) 
 	`
 	var uid_scan int
-	_, err_1 := pool.Exec(ctx, sql_insert, uid_nxt+1, username, string(pass_bytes), description, email)
-	fmt.Println(ctx, sql_insert, uid_nxt+1, username, string(pass_bytes), description, email)
+	_, err_1 := pool.Exec(ctx, sql_insert, uid_nxt+1, Username, string(pass_bytes), Description, Email)
 	if err_1 != nil {
 		return fmt.Errorf("Error with %s", err_1.Error())
 	}
 
-	fmt.Printf("Inserted record with %d", uid_scan)
 	return nil
 }
 
-func validateUser(email, password string) error {
+func validateUser(Email, password string) error {
 	sql := `
-	SELECT password FROM userdata WHERE email=$1 
+	SELECT password FROM userdata WHERE Email=$1 
 	`
 	var password_usr string
-	err := pool.QueryRow(ctx, sql, email).Scan(&password_usr)
+	err := pool.QueryRow(ctx, sql, Email).Scan(&password_usr)
 	if err != nil {
 		return fmt.Errorf("Unable to fetch user: %s", err.Error())
 	}
 	if err := bcrypt.CompareHashAndPassword([]byte(password_usr), []byte(password)); err != nil {
 		return fmt.Errorf("Wrong password")
 	}
-	fmt.Println(bcrypt.CompareHashAndPassword([]byte(password_usr), []byte(password)))
 	return nil
+}
+
+func getUserData(Email string) User {
+	sql := `
+	SELECT username,description,points,email FROM userdata WHERE email=$1  
+	`
+	var usr_1 User = User{
+		Username:    "",
+		Description: "",
+		Points:      0,
+		Email:       "",
+	}
+	pool.QueryRow(ctx, sql, Email).Scan(
+		&usr_1.Username,
+		&usr_1.Description,
+		&usr_1.Points,
+		&usr_1.Email,
+	)
+
+	return usr_1
 }
