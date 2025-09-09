@@ -72,12 +72,24 @@
 	async function fetchUser() {
 		try {
 			const res = await fetch(
-				`http://localhost:8080/v1/getUser?email=${encodeURIComponent(usr_email)}`
+				`http://localhost:8080/v1/login?email=${encodeURIComponent(usr_email)}&passwd=${encodeURIComponent(usr_pass)}`,
+				{
+					credentials: 'include'
+				}
 			);
 			if (res.ok) {
-				user = await res.json();
-				console.log('Enters');
+				user = await fetch(
+					`http://localhost:8080/v1/getUserData?email=${encodeURIComponent(usr_email)}`,
+					{
+						credentials: 'include'
+					}
+				);
+
 				console.log(user);
+			} else if (res.status == 500) {
+				alert('Please check your browser cookie settings');
+			} else if (res.status == 404) {
+				alert('Enter a valid email/password');
 			}
 		} catch (err) {
 			console.log(err.message);

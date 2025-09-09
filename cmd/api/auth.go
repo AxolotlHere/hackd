@@ -2,13 +2,10 @@ package main
 
 import (
 	"fmt"
-	"github.com/gorilla/sessions"
 	"golang.org/x/crypto/bcrypt"
 	"net/mail"
 	"regexp"
 )
-
-var store = sessions.NewCookieStore([]byte("<placeholder-for-now-lol>"))
 
 func validatePassword(password string) error {
 	if ok, _ := regexp.MatchString(`^.{8,}$`, password); !ok {
@@ -54,7 +51,6 @@ func createUser(Username, Description, Email, password string) error {
 	sql_insert := `
 	INSERT INTO userdata VALUES ($1,$2,$3,0,0,$4,$5) 
 	`
-	var uid_scan int
 	_, err_1 := pool.Exec(ctx, sql_insert, uid_nxt+1, Username, string(pass_bytes), Description, Email)
 	if err_1 != nil {
 		return fmt.Errorf("Error with %s", err_1.Error())
@@ -63,19 +59,20 @@ func createUser(Username, Description, Email, password string) error {
 	return nil
 }
 
-func validateUser(Email, password string) error {
+func validateUser(Email, password string) bool {
 	sql := `
 	SELECT password FROM userdata WHERE Email=$1 
 	`
 	var password_usr string
 	err := pool.QueryRow(ctx, sql, Email).Scan(&password_usr)
 	if err != nil {
-		return fmt.Errorf("Unable to fetch user: %s", err.Error())
+		fmt.Println(fmt.Errorf("Unable to fetch user: %s", err.Error()))
+		return false
 	}
 	if err := bcrypt.CompareHashAndPassword([]byte(password_usr), []byte(password)); err != nil {
-		return fmt.Errorf("Wrong password")
+		return false
 	}
-	return nil
+	return true
 }
 
 func getUserData(Email string) User {
@@ -94,6 +91,5 @@ func getUserData(Email string) User {
 		&usr_1.Points,
 		&usr_1.Email,
 	)
-
 	return usr_1
 }

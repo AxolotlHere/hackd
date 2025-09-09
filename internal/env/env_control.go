@@ -26,5 +26,12 @@ func GetDatabaseCreds() DatabaseCreds {
 		Db_url:  os.Getenv("DB_URL"),
 		Db_name: os.Getenv("DB_NAME"),
 	}
+}
 
+func GetSessionCreds() string {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	return os.Getenv("SESSION_SEED")
 }
